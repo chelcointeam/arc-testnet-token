@@ -1,0 +1,15 @@
+# Remix IDE dependencies and build artifacts
+.deps/
+artifacts/
+
+# Node.js
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# Balance log (auto-generated)
+balance_log.csv
