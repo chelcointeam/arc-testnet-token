@@ -1,0 +1,18 @@
+{
+  "name": "arc-testnet-token",
+  "version": "1.0.0",
+  "description": "ERC-20 token + balance monitoring tool built on Circle's Arc Testnet",
+  "scripts": {
+    "test": "npx hardhat test",
+    "deploy": "npx hardhat run scripts/deploy.js --network arc_testnet",
+    "deploy:local": "npx hardhat run scripts/deploy.js"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
+    "dotenv": "^16.0.0"
+  }
+}

@@ -5,47 +5,70 @@
 ![Solidity](https://img.shields.io/badge/solidity-^0.8.20-363636)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
-A simple ERC-20 token deployed on Circle's **Arc Testnet** — a stablecoin-native Layer-1 blockchain using USDC as gas. Includes a Python monitoring tool for tracking wallet USDC balance in real time.
+A simple ERC-20 token deployed on Circle's **Arc Testnet** — a stablecoin-native Layer-1 blockchain using USDC as gas. Includes a Hardhat project structure with deploy scripts, unit tests, and a Python monitoring tool for tracking wallet USDC balance in real time.
 
 ## Contract Details
 
 | Field | Value |
 |---|---|
 | Contract Address | [`0x2D30Fe563d780Be98422044733FeFFD8F0FC245C`](https://testnet.arcscan.app/address/0x2D30Fe563d780Be98422044733FeFFD8F0FC245C) |
-| Deploy Tx | [`0xb25a9f02b57cda4fc64b5e7306f8d7a4f704e13b66260c81e79e87e4806d5240`](https://testnet.arcscan.app/tx/0xb25a9f02b57cda4fc64b5e7306f8d7a4f704e13b66260c81e79e87e4806d5240) |
+| Deploy Tx | [`0xb25a9f02...d5240`](https://testnet.arcscan.app/tx/0xb25a9f02b57cda4fc64b5e7306f8d7a4f704e13b66260c81e79e87e4806d5240) |
 | Token Name | MyToken (MTK) |
 | Network | Arc Testnet |
 | Chain ID | 5042002 |
 | RPC URL | https://rpc.testnet.arc.network |
 | Explorer | [View on Arcscan](https://testnet.arcscan.app/address/0x2D30Fe563d780Be98422044733FeFFD8F0FC245C) |
 
+## Project Structure
+
+```
+arc-testnet-token/
+├── contracts/
+│   └── MyToken.sol        # ERC-20 token contract
+├── scripts/
+│   └── deploy.js          # Hardhat deploy script
+├── test/
+│   └── MyToken.test.js    # Unit tests (Hardhat + Chai)
+├── tools/
+│   └── monitor.py         # Python balance monitor
+├── hardhat.config.js
+├── package.json
+└── .gitignore
+```
+
 ## Tech Stack
 
 - **Solidity** ^0.8.20 + OpenZeppelin Contracts (ERC20, Ownable)
-- Deployed via **Remix IDE** + MetaMask (Injected Provider)
+- **Hardhat** ^2.22 — compile, test, deploy
+- Deployed via **Remix IDE** + MetaMask (Injected Provider) on Arc Testnet
 - **Python** 3.x + web3.py for balance monitoring
 
-## Files
+## Quick Start
 
-| File | Description |
-|---|---|
-| `MyToken.sol` | ERC-20 token contract with owner-only `mint()` function |
-| `monitor.py` | Polls wallet USDC balance every 60s via RPC, logs to CSV |
-| `balance_log.csv` | Auto-generated balance log (timestamp, balance) |
+```bash
+npm install
+npx hardhat test
+```
 
-## How to Run the Monitor
+To deploy to Arc Testnet:
+```bash
+cp .env.example .env   # add your PRIVATE_KEY
+npx hardhat run scripts/deploy.js --network arc_testnet
+```
+
+## Run the Balance Monitor
 
 ```bash
 pip install web3
-python monitor.py
+python tools/monitor.py
 ```
 
-The script connects to Arc Testnet RPC, checks the wallet balance every 60 seconds and appends results to `balance_log.csv`.
+Polls Arc Testnet RPC every 60 seconds and logs USDC balance to `balance_log.csv`.
 
 ## Next Steps
 
-- Add `burn()` function to MyToken.sol to allow token destruction by holder
-- Write Hardhat unit tests for `mint()` and `burn()` functions
+- Add `burn()` function to allow token destruction by holder
+- Add `pause/unpause` using OpenZeppelin `Pausable`
 - Extend `monitor.py` with Telegram bot notifications on balance changes
 
 ## License
