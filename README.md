@@ -12,6 +12,7 @@ A simple ERC-20 token deployed on Circle's **Arc Testnet** — a stablecoin-nati
 | Field | Value |
 |---|---|
 | Contract Address | [`0x2D30Fe563d780Be98422044733FeFFD8F0FC245C`](https://testnet.arcscan.app/address/0x2D30Fe563d780Be98422044733FeFFD8F0FC245C) |
+| Deploy Tx | [`0xb25a9f02b57cda4fc64b5e7306f8d7a4f704e13b66260c81e79e87e4806d5240`](https://testnet.arcscan.app/tx/0xb25a9f02b57cda4fc64b5e7306f8d7a4f704e13b66260c81e79e87e4806d5240) |
 | Token Name | MyToken (MTK) |
 | Network | Arc Testnet |
 | Chain ID | 5042002 |
