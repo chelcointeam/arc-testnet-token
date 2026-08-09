@@ -32,18 +32,23 @@ w3 = Web3(Web3.HTTPProvider(RPC_URL))
 
 def check_balance() -> float:
     """Fetch current wallet balance from Arc Testnet RPC."""
+    if not w3.is_connected():
+        raise ConnectionError(f"Cannot connect to RPC: {RPC_URL}")
     balance = w3.eth.get_balance(WALLET)
     return float(w3.from_wei(balance, "ether"))
 
 
 def log_balance() -> None:
     """Check balance, print to console and append to CSV log."""
-    bal = check_balance()
-    ts = time.strftime("%Y-%m-%d %H:%M:%S")
-    print(f"[{ts}] Balance: {bal} USDC")
-    with open(LOG_FILE, "a", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow([ts, bal])
+    try:
+        bal = check_balance()
+        ts = time.strftime("%Y-%m-%d %H:%M:%S")
+        print(f"[{ts}] Balance: {bal} USDC")
+        with open(LOG_FILE, "a", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow([ts, bal])
+    except Exception as e:
+        print(f"[ERROR] {e}")
 
 
 if __name__ == "__main__":
