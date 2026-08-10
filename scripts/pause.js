@@ -1,7 +1,7 @@
-// Pause / unpause ArcToken on Arc Testnet
+// Pause / unpause PayToken on Arc Testnet
 // Usage:
-//   npx hardhat run scripts/pause.js --network arc_testnet          # pause
-//   UNPAUSE=1 npx hardhat run scripts/pause.js --network arc_testnet # unpause
+//   TOKEN_ADDRESS=0x... npx hardhat run scripts/pause.js --network arc_testnet
+//   UNPAUSE=1 TOKEN_ADDRESS=0x... npx hardhat run scripts/pause.js --network arc_testnet
 
 const { ethers } = require("hardhat");
 
@@ -9,32 +9,32 @@ const CONTRACT_ADDRESS = process.env.TOKEN_ADDRESS;
 
 async function main() {
   if (!CONTRACT_ADDRESS) {
-    throw new Error("Set TOKEN_ADDRESS env var to the deployed contract address");
+    throw new Error("TOKEN_ADDRESS is not set");
   }
 
   const [owner] = await ethers.getSigners();
-  const ArcToken = await ethers.getContractFactory("ArcToken");
-  const token = ArcToken.attach(CONTRACT_ADDRESS);
+  const PayToken = await ethers.getContractFactory("PayToken");
+  const token = PayToken.attach(CONTRACT_ADDRESS);
 
   const shouldUnpause = process.env.UNPAUSE === "1";
   const currentlyPaused = await token.paused();
 
   if (shouldUnpause) {
     if (!currentlyPaused) {
-      console.log("Contract is already unpaused — nothing to do.");
+      console.log("already unpaused");
       return;
     }
     const tx = await token.connect(owner).unpause();
     await tx.wait();
-    console.log("✅  Contract unpaused. Tx:", tx.hash);
+    console.log("unpaused, tx:", tx.hash);
   } else {
     if (currentlyPaused) {
-      console.log("Contract is already paused — nothing to do.");
+      console.log("already paused");
       return;
     }
     const tx = await token.connect(owner).pause();
     await tx.wait();
-    console.log("⏸️   Contract paused. Tx:", tx.hash);
+    console.log("paused, tx:", tx.hash);
   }
 }
 
