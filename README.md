@@ -1,75 +1,115 @@
-# Arc Testnet Token & Monitoring Tool
+# ArcToken — Payment-Flow Testing on Arc Testnet
 
 ![Arc Testnet](https://img.shields.io/badge/network-Arc%20Testnet-blue)
-![Status](https://img.shields.io/badge/status-deployed-brightgreen)
 ![Solidity](https://img.shields.io/badge/solidity-^0.8.20-363636)
+![Status](https://img.shields.io/badge/status-active-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
-A simple ERC-20 token deployed on Circle's **Arc Testnet** — a stablecoin-native Layer-1 blockchain using USDC as gas. Includes a Hardhat project structure with deploy scripts, unit tests, and a Python monitoring tool for tracking wallet USDC balance in real time.
+An ERC-20 token purpose-built for **end-to-end payment-flow testing** on Circle's [Arc Testnet](https://testnet.arcscan.app) — a stablecoin-native Layer-1 that uses USDC as gas. `ArcToken` adds `pause` (circuit-breaker) and `burn` (settlement / void) on top of standard `mint`+`transfer`, giving you a complete lifecycle to drive integration tests against.
 
 ## Contract Details
 
 | Field | Value |
 |---|---|
 | Contract Address | [`0x2D30Fe563d780Be98422044733FeFFD8F0FC245C`](https://testnet.arcscan.app/address/0x2D30Fe563d780Be98422044733FeFFD8F0FC245C) |
-| Deploy Tx | [`0xb25a9f02...d5240`](https://testnet.arcscan.app/tx/0xb25a9f02b57cda4fc64b5e7306f8d7a4f704e13b66260c81e79e87e4806d5240) |
-| Token Name | MyToken (MTK) |
+| Token Name / Symbol | ArcToken / ARC |
 | Network | Arc Testnet |
 | Chain ID | 5042002 |
-| RPC URL | https://rpc.testnet.arc.network |
-| Explorer | [View on Arcscan](https://testnet.arcscan.app/address/0x2D30Fe563d780Be98422044733FeFFD8F0FC245C) |
+| RPC URL | `https://rpc.testnet.arc.network` |
+| Explorer | [testnet.arcscan.app](https://testnet.arcscan.app/address/0x2D30Fe563d780Be98422044733FeFFD8F0FC245C) |
+
+## Payment Flow
+
+The canonical test cycle implemented by this repo:
+
+```
+owner.mint(customer, N)
+  └─▶ customer.transfer(merchant, N)     ← payment
+        └─▶ merchant.burn(N)             ← settlement / void
+```
+
+The `pause()` / `unpause()` circuit-breaker can be injected at any step to verify your application handles `EnforcedPause` reverts correctly.
+
+## Contract Features
+
+| Feature | Method | Who |
+|---|---|---|
+| Mint tokens | `mint(to, amount)` | Owner only |
+| Transfer | `transfer(to, amount)` | Any holder |
+| Burn own tokens | `burn(amount)` | Any holder |
+| Burn with allowance | `burnFrom(from, amount)` | Approved spender |
+| Pause all transfers | `pause()` | Owner only |
+| Resume transfers | `unpause()` | Owner only |
 
 ## Project Structure
 
 ```
 arc-testnet-token/
 ├── contracts/
-│   └── MyToken.sol        # ERC-20 token contract
+│   └── ArcToken.sol              # Pausable + Burnable ERC-20
 ├── scripts/
-│   └── deploy.js          # Hardhat deploy script
+│   ├── deploy.js                 # Deploy to Arc Testnet
+│   ├── pause.js                  # Pause / unpause deployed contract
+│   └── simulate-payment.js      # Full mint→transfer→burn simulation
 ├── test/
-│   └── MyToken.test.js    # Unit tests (Hardhat + Chai)
+│   └── ArcToken.test.js          # Hardhat/Chai test suite
 ├── tools/
-│   └── monitor.py         # Python balance monitor
+│   └── monitor.py                # Python USDC balance monitor
 ├── hardhat.config.js
 ├── package.json
-└── .gitignore
+└── .env.example
 ```
-
-## Tech Stack
-
-- **Solidity** ^0.8.20 + OpenZeppelin Contracts (ERC20, Ownable)
-- **Hardhat** ^2.22 — compile, test, deploy
-- Deployed via **Remix IDE** + MetaMask (Injected Provider) on Arc Testnet
-- **Python** 3.x + web3.py for balance monitoring
 
 ## Quick Start
 
 ```bash
 npm install
-npx hardhat test
+npx hardhat test          # run full test suite locally
 ```
 
-To deploy to Arc Testnet:
+## Deploy
+
 ```bash
-cp .env.example .env   # add your PRIVATE_KEY
+cp .env.example .env      # paste your PRIVATE_KEY
 npx hardhat run scripts/deploy.js --network arc_testnet
 ```
 
-## Run the Balance Monitor
+## Pause / Unpause
+
+```bash
+# Pause
+TOKEN_ADDRESS=0x... npx hardhat run scripts/pause.js --network arc_testnet
+
+# Unpause
+UNPAUSE=1 TOKEN_ADDRESS=0x... npx hardhat run scripts/pause.js --network arc_testnet
+```
+
+## Run Payment Simulation
+
+```bash
+# Basic flow: mint → transfer → burn
+TOKEN_ADDRESS=0x... npx hardhat run scripts/simulate-payment.js --network arc_testnet
+
+# With circuit-breaker: pause injected between mint and transfer
+PAUSE_BETWEEN=1 TOKEN_ADDRESS=0x... npx hardhat run scripts/simulate-payment.js --network arc_testnet
+```
+
+The simulation logs each step with the transaction hash so you can verify on [Arcscan](https://testnet.arcscan.app).
+
+## Balance Monitor
 
 ```bash
 pip install web3
 python tools/monitor.py
 ```
 
-Polls Arc Testnet RPC every 60 seconds and logs USDC balance to `balance_log.csv`.
+Polls the Arc Testnet RPC every 60 s and appends USDC balance to `balance_log.csv`.
 
-## Next Steps
+## Tech Stack
 
-- Add `burn()` function to allow token destruction by holder
-- Add `pause/unpause` using OpenZeppelin `Pausable`
-- Extend `monitor.py` with Telegram bot notifications on balance changes
+- **Solidity** ^0.8.20 + OpenZeppelin (ERC20, ERC20Burnable, ERC20Pausable, Ownable)
+- **Hardhat** ^2.22 — compile / test / deploy
+- **Python** 3.x + web3.py — balance monitoring
 
 ## License
 
