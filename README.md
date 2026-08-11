@@ -46,3 +46,7 @@ PAUSE_BETWEEN=1 TOKEN_ADDRESS=0x... npx hardhat run scripts/simulate-payment.js 
 
 Notes: pause is meant as a manual kill switch if something looks wrong
 mid-integration, not a governance feature.
+
+## Monitoring
+
+`tools/balance-watch.js` polls PayToken balances for configured addresses and the contract pause state at a fixed interval. It writes only state changes, which helps a merchant detect transfers that may be blocked or stalled while the token is paused.
