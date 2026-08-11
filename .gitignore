@@ -1,6 +1,7 @@
 # Remix IDE dependencies and build artifacts
 .deps/
 artifacts/
+cache/
 
 # Node.js
 node_modules/

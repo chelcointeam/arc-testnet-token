@@ -1,15 +1,19 @@
-# PayToken
+# MyToken
 
-ERC-20 token used to test settlement mechanics on Arc Testnet before wiring
-them into a payment backend. Adds mint, burn and pause on top of a standard
-OpenZeppelin token so a merchant integration can be tested without touching
-mainnet infra.
+ERC-20 token deployed on Arc Testnet to test settlement mechanics before
+wiring them into a payment backend. Uses OpenZeppelin's audited ERC20 and
+Ownable, so the contract is a standard, verifiable deployment on Arc.
 
 ## Contract
 
-- `contracts/PayToken.sol` — ERC20 + ERC20Burnable + ERC20Pausable
-- owner can mint and pause/unpause
-- any holder can burn their own balance or approve burnFrom
+- `contracts/MyToken.sol` — ERC20 + Ownable, only owner can mint
+
+## Deployed on Arc Testnet
+
+- Contract: [0x2D30Fe563d780Be98422044733FeFFD8F0FC245C](https://testnet.arcscan.app/address/0x2D30Fe563d780Be98422044733FeFFD8F0FC245C)
+- Verified: yes
+- Deploy tx: [0xb25a9f02b57cda4fc64b5e7306f8d7a4f704e13b66260c81e79e87e4806d5240](https://testnet.arcscan.app/tx/0xb25a9f02b57cda4fc64b5e7306f8d7a4f704e13b66260c81e79e87e4806d5240)
+- Deployer: `0x60b73717cF711F312A621F19bd76Ac138DA5af76`
 
 ## Setup
 
@@ -30,23 +34,12 @@ npx hardhat test
 npx hardhat run scripts/deploy.js --network arc_testnet
 ```
 
-## Pause / unpause
-
-```
-TOKEN_ADDRESS=0x... npx hardhat run scripts/pause.js --network arc_testnet
-UNPAUSE=1 TOKEN_ADDRESS=0x... npx hardhat run scripts/pause.js --network arc_testnet
-```
-
-## Simulate a transfer + settlement cycle
+## Simulate a transfer cycle
 
 ```
 TOKEN_ADDRESS=0x... npx hardhat run scripts/simulate-payment.js --network arc_testnet
-PAUSE_BETWEEN=1 TOKEN_ADDRESS=0x... npx hardhat run scripts/simulate-payment.js --network arc_testnet
 ```
-
-Notes: pause is meant as a manual kill switch if something looks wrong
-mid-integration, not a governance feature.
 
 ## Monitoring
 
-`tools/balance-watch.js` polls PayToken balances for configured addresses and the contract pause state at a fixed interval. It writes only state changes, which helps a merchant detect transfers that may be blocked or stalled while the token is paused.
+`tools/balance-watch.js` polls MyToken balances for configured addresses at a fixed interval. It writes only state changes, which helps a merchant detect transfers that may be blocked or stalled.

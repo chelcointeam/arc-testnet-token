@@ -1,6 +1,6 @@
-// Watch PayToken balances and pause state on Arc Testnet.
+// Watch MyToken balances on Arc Testnet.
 // Usage: node tools/balance-watch.js
-// Env: RPC_URL, PAYTOKEN_ADDRESS, WATCH_ADDRESSES (comma-separated),
+// Env: RPC_URL, MYTOKEN_ADDRESS, WATCH_ADDRESSES (comma-separated),
 //      BALANCE_WATCH_INTERVAL_MS (default 30000), BALANCE_WATCH_LOG_FILE (optional)
 
 const fs = require("fs");
@@ -8,7 +8,7 @@ const path = require("path");
 const { ethers } = require("ethers");
 
 const RPC_URL = process.env.RPC_URL;
-const PAYTOKEN_ADDRESS = process.env.PAYTOKEN_ADDRESS;
+const MYTOKEN_ADDRESS = process.env.MYTOKEN_ADDRESS;
 const WATCH_ADDRESSES = (process.env.WATCH_ADDRESSES || "")
   .split(",")
   .map((s) => s.trim())
@@ -18,7 +18,6 @@ const LOG_FILE = process.env.BALANCE_WATCH_LOG_FILE;
 
 const ABI = [
   "function balanceOf(address account) view returns (uint256)",
-  "function paused() view returns (bool)",
 ];
 
 let lastState = "";
@@ -33,18 +32,17 @@ function writeLine(line) {
 }
 
 async function poll(token, addresses) {
-  const paused = await token.paused();
   const balances = {};
   for (const addr of addresses) {
     balances[addr] = (await token.balanceOf(addr)).toString();
   }
-  const state = JSON.stringify({ paused, balances });
+  const state = JSON.stringify(balances);
   if (state !== lastState) {
     const ts = new Date().toISOString();
     const parts = addresses.map(
       (a) => `${a} ${balances[a]}`
     );
-    writeLine(`[${ts}] paused=${paused} ${parts.join(" | ")}`);
+    writeLine(`[${ts}] ${parts.join(" | ")}`);
     lastState = state;
   }
 }
@@ -63,15 +61,15 @@ async function tick(token, addresses) {
 }
 
 async function main() {
-  if (!RPC_URL || !PAYTOKEN_ADDRESS || WATCH_ADDRESSES.length === 0) {
+  if (!RPC_URL || !MYTOKEN_ADDRESS || WATCH_ADDRESSES.length === 0) {
     console.error(
-      "RPC_URL, PAYTOKEN_ADDRESS and WATCH_ADDRESSES are required"
+      "RPC_URL, MYTOKEN_ADDRESS and WATCH_ADDRESSES are required"
     );
     process.exit(1);
   }
 
   const provider = new ethers.JsonRpcProvider(RPC_URL);
-  const token = new ethers.Contract(PAYTOKEN_ADDRESS, ABI, provider);
+  const token = new ethers.Contract(MYTOKEN_ADDRESS, ABI, provider);
 
   await tick(token, WATCH_ADDRESSES);
   setInterval(() => tick(token, WATCH_ADDRESSES), INTERVAL_MS);

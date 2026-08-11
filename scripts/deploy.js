@@ -1,4 +1,4 @@
-// Deploy PayToken to Arc Testnet
+// Deploy MyToken to Arc Testnet
 // Usage: npx hardhat run scripts/deploy.js --network arc_testnet
 
 const fs = require("fs");
@@ -12,14 +12,14 @@ async function main() {
   const balance = await ethers.provider.getBalance(deployer.address);
   console.log("balance (wei):", balance.toString());
 
-  const initialSupply = 1_000_000;
-  const PayToken = await ethers.getContractFactory("PayToken");
-  const token = await PayToken.deploy(initialSupply);
+  const initialSupply = 1_000;
+  const MyToken = await ethers.getContractFactory("MyToken");
+  const token = await MyToken.deploy(initialSupply);
   await token.waitForDeployment();
 
   const address = await token.getAddress();
-  console.log("PayToken deployed to:", address);
-  console.log("initial supply:", initialSupply, "PAY");
+  console.log("MyToken deployed to:", address);
+  console.log("initial supply:", initialSupply, "MTK");
   console.log("explorer:", `https://testnet.arcscan.app/address/${address}`);
 
   const receipt = await token.deploymentTransaction().wait();

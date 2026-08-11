@@ -1,3 +1,4 @@
+## 2026-08-11 — renamed token back to MyToken, matches verified Arc testnet deployment
 ## 2026-08-11 — added balance monitor, deployment tracking and CI
 ## 2026-08-10 — rename token, added pause/burn and payment-flow tests
 ## 2026-08-09 — monitor: handle connection error gracefully
