@@ -40,6 +40,14 @@ npx hardhat run scripts/deploy.js --network arc_testnet
 TOKEN_ADDRESS=0x... npx hardhat run scripts/simulate-payment.js --network arc_testnet
 ```
 
+## Generate on-chain activity
+
+```
+TOKEN_ADDRESS=0x... TARGET_ADDRESS=0x... npx hardhat run scripts/activity.js --network arc_testnet
+```
+
+Mints `MINT_AMOUNT` MTK to `TARGET_ADDRESS`, then transfers `TRANSFER_AMOUNT` MTK to the same address. Configurable via env vars, defaults in `.env.example`.
+
 ## Monitoring
 
 `tools/balance-watch.js` polls MyToken balances for configured addresses at a fixed interval. It writes only state changes, which helps a merchant detect transfers that may be blocked or stalled.
